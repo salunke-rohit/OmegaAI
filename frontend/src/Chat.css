@@ -1,7 +1,10 @@
+@import "highlight.js/styles/vs2015.css";
+
 .chats {
-    max-width: 700px;
+    width: min(100%, 900px);
+    flex: 1;
     overflow-y: auto;
-    padding: 8rem;
+    padding: 32px 48px;
 
     /* Firefox */
     scrollbar-width: none;
@@ -15,25 +18,83 @@
 .userDiv {
     display: flex;
     justify-content: flex-end;
-
+    margin-bottom: 20px;
 }
 
-.getDiv {
-    text-align: left;
-    font-size: 0.9rem;
+.gptDiv {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
 }
 
 .usermessage {
-    background-color: #323232;
-    padding: 10px 20px;
+    max-width: min(80%, 600px);
+    margin: 0;
+    padding: 10px 16px;
     border-radius: 14px;
-    margin-left: 15rem;
-    max-width: 500px;
-    width: fit-content;
-
-
+    background-color: var(--surface-color);
+    overflow-wrap: anywhere;
 }
 
 .gptmessage {
+    width: 100%;
+    max-width: 700px;
+    text-align: left;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
 
+.gptmessage > :first-child {
+    margin-top: 0;
+}
+
+.gptmessage > :last-child {
+    margin-bottom: 0;
+}
+
+.gptmessage pre {
+    overflow-x: auto;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #1e1e1e;
+}
+
+.gptmessage pre code {
+    padding: 0;
+    background: transparent;
+    font-family: Consolas, "Courier New", monospace;
+}
+
+.gptmessage :not(pre) > code {
+    padding: 2px 5px;
+    border-radius: 4px;
+    background-color: var(--surface-color);
+}
+
+.gptmessage table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+}
+
+.gptmessage th,
+.gptmessage td {
+    padding: 6px 10px;
+    border: 1px solid #555;
+}
+
+.welcome-message {
+    margin: 28px 0 0;
+    font-size: 1.5rem;
+}
+
+@media (max-width: 640px) {
+    .chats {
+        padding: 24px 16px;
+    }
+
+    .usermessage {
+        max-width: 92%;
+    }
 }

@@ -1,77 +1,105 @@
 import "./ChatWindow.css"
 import Chat from "./Chat.jsx"
 import { MyContext } from "./MyContext.jsx";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import {ScaleLoader} from "react-spinners"; 
 
 function ChatWindow () {
-    const { prompt , setPrompt, reply, setReply, currThreadId, setCurrThreadId, prevChats, setPrevChats} = useContext (MyContext);
-    const [ loading, setLoading ] = useState(false); 
-    const   getReply = async () =>{
-        setLoading(true);
-        const options = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: prompt,
-                threadId: currThreadId
-            })
-        };
-        try {
-            const response = await fetch("http://localhost:8080/api/chat", options);
-            const res = await response.json();
-            console.log(res)
-            setReply(res.reply);
+    const {
+        prompt, setPrompt, setReply, currThreadId, setPrevChats,
+        setNewChat, refreshThreads, theme, setTheme, isBusy, setIsBusy
+    } = useContext(MyContext);
+    const [requestError, setRequestError] = useState("");
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
-        }catch(err){
-            console.log(err)
-        }
-        setLoading(false);
-    }
+    const sendMessage = async (event) => {
+        event.preventDefault();
+        const message = prompt.trim();
+        if (!message || isBusy) return;
 
-    // append new chat to prev chat 
-
-    useEffect (()=>{
-        if( prompt && reply ){
-            setPrevChats( prevChats =>{
-                [...prevChats , {
-                    role: "user",
-                    content: prompt
-                },
-            {
-                role: "assistent",
-                content : "reply "
-            }]
-            });
-        }
+        setIsBusy(true);
+        setRequestError("");
+        setReply(null);
         setPrompt("");
-    }, [reply])
+        setNewChat(false);
+        setPrevChats((chats) => [...chats, { role: "user", content: message }]);
+
+        try {
+            const response = await fetch("http://localhost:8080/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message, threadId: currThreadId })
+            });
+            if (!response.ok) {
+                throw new Error("Could not get a response. Please try again.");
+            }
+
+            const res = await response.json();
+            if (typeof res.reply !== "string") {
+                throw new Error("The server returned an invalid response.");
+            }
+
+            setReply(res.reply);
+            setPrevChats((chats) => [...chats, { role: "assistant", content: res.reply }]);
+            refreshThreads();
+        } catch (error) {
+            setRequestError(error.message);
+            setPrevChats((chats) => chats.slice(0, -1));
+            setPrompt(message);
+        } finally {
+            setIsBusy(false);
+        }
+    }
 
     return (
         <div className="chatwindow">
             <div className="navbar">
-                <span>OmegaAI &nbsp; <i className="fa-solid fa-chevron-down"></i> </span>
+                <span className="brand-name">OmegaAI</span>
                 <div className="usericondiv">
-                    <span className="usericon"><i className="fa-solid fa-circle-user"></i></span>
+                    <button
+                        className="usericon"
+                        type="button"
+                        aria-label="Open profile options"
+                        aria-expanded={profileMenuOpen}
+                        onClick={() => setProfileMenuOpen((open) => !open)}
+                    >
+                        <i className="fa-solid fa-circle-user" aria-hidden="true"></i>
+                    </button>
+                    {profileMenuOpen && (
+                        <div className="profile-menu">
+                            <span className="profile-menu-title">Appearance</span>
+                            <button
+                                type="button"
+                                className="theme-option"
+                                onClick={() => {
+                                    setTheme(theme === "dark" ? "light" : "dark");
+                                    setProfileMenuOpen(false);
+                                }}
+                            >
+                                <i className={`fa-solid ${theme === "dark" ? "fa-sun" : "fa-moon"}`} aria-hidden="true"></i>
+                                Switch to {theme === "dark" ? "light" : "dark"} mode
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
-            <Chat>
-            </Chat>
-            <ScaleLoader color="white" loading={loading}></ScaleLoader>
+            <Chat />
             <div className="chatinput">
-                <div className="inputbox">
-                    <input placeholder="Ask anything" 
-                    value={prompt}
-                    onChange ={(e)=>setPrompt(e.target.value)}
-                    onKeyDown={(e)=>e.key==='Enter'?getReply():""}
-                    >
-                    
-                    </input>
-                    <div id="submit" onClick={getReply}> <i className="fa-regular fa-paper-plane"></i> </div>
-                </div>
-                <p className="info">OmegaAI can make misteks. cheack importent info.</p>
+                {requestError && <p className="chat-error" role="alert">{requestError}</p>}
+                <ScaleLoader color={theme === "dark" ? "#ececec" : "#333"} loading={isBusy} />
+                <form className="inputbox" onSubmit={sendMessage}>
+                    <input
+                        placeholder="Ask anything"
+                        value={prompt}
+                        onChange={(event) => setPrompt(event.target.value)}
+                        disabled={isBusy}
+                        aria-label="Message"
+                    />
+                    <button id="submit" type="submit" disabled={isBusy || !prompt.trim()} aria-label="Send message">
+                        <i className="fa-regular fa-paper-plane" aria-hidden="true"></i>
+                    </button>
+                </form>
+                <p className="info">OmegaAI can make mistakes. Check important information.</p>
             </div>
 
         </div>
