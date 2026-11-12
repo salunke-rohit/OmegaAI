@@ -13,6 +13,7 @@
 body {
     min-width: 320px;
     min-height: 100vh;
+    min-height: 100dvh;
     margin: 0;
 }
 
@@ -30,7 +31,13 @@ input {
     --hover-color: rgba(255, 255, 255, 0.08);
     --border-color: rgba(255, 255, 255, 0.14);
     display: flex;
+    width: 100%;
+    min-width: 0;
     min-height: 100vh;
+    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
     color: var(--text-color);
     background: var(--app-bg);
 }

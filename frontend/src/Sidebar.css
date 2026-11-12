@@ -1,11 +1,40 @@
 .sidebar {
+    position: relative;
     display: flex;
-    flex: 0 0 280px;
+    flex: 0 0 var(--sidebar-width, 280px);
     flex-direction: column;
+    min-width: 0;
     height: 100vh;
+    height: 100dvh;
     padding: 12px;
     color: var(--text-color);
     background: var(--sidebar-bg);
+}
+
+.sidebar-resizer {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: -6px;
+    width: 12px;
+    height: 100%;
+    cursor: col-resize;
+    touch-action: none;
+}
+
+.sidebar-resizer::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 5px;
+    width: 2px;
+    content: "";
+}
+
+.sidebar-resizer:hover::after,
+.sidebar-resizer:focus-visible::after {
+    outline: none;
+    background: #339cff;
 }
 
 .new-chat-button,
@@ -139,11 +168,23 @@
     margin: 0;
 }
 
+@media (min-width: 641px) and (max-width: 900px) {
+    .sidebar {
+        padding: 10px;
+    }
+
+    .history-container {
+        margin-top: 18px;
+    }
+}
+
 @media (max-width: 640px) {
     .sidebar {
         flex-basis: 68px;
         align-items: center;
         padding: 10px 6px;
+        height: 100vh;
+        height: 100dvh;
     }
 
     .new-chat-button {
@@ -155,6 +196,10 @@
     .new-chat-button > i,
     .history-container,
     .sign {
+        display: none;
+    }
+
+    .sidebar-resizer {
         display: none;
     }
 }

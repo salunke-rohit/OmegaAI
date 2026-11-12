@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { MyContext } from "./MyContext.jsx";
 import {v1 as uuidv1} from "uuid";
 
-function Sidebar () {
+function Sidebar({ sidebarWidth, onResize }) {
     const {
         allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply,
         setCurrThreadId, setPrevChats, threadError, setThreadError,
@@ -120,7 +120,32 @@ function Sidebar () {
             <div className="sign">
                 <p>By RohitSalunke &hearts;</p>
             </div>
-
+            <div
+                className="sidebar-resizer"
+                role="separator"
+                aria-label="Resize sidebar"
+                aria-orientation="vertical"
+                aria-valuemin={Math.min(200, sidebarWidth)}
+                aria-valuemax={Math.min(480, window.innerWidth * 0.42, window.innerWidth - 320)}
+                aria-valuenow={sidebarWidth}
+                tabIndex={0}
+                onPointerDown={(event) => {
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                    onResize(event.clientX);
+                }}
+                onPointerMove={(event) => {
+                    if (event.buttons === 1) onResize(event.clientX);
+                }}
+                onKeyDown={(event) => {
+                    if (event.key === "ArrowLeft") {
+                        event.preventDefault();
+                        onResize(sidebarWidth - 16);
+                    } else if (event.key === "ArrowRight") {
+                        event.preventDefault();
+                        onResize(sidebarWidth + 16);
+                    }
+                }}
+            />
         </section>
     )
 }

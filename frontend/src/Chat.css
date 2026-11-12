@@ -97,4 +97,15 @@
     .usermessage {
         max-width: 92%;
     }
+
+    .gptmessage pre {
+        max-width: 100%;
+        padding: 10px;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+    .chats {
+        padding: 28px clamp(20px, 5vw, 40px);
+    }
 }
