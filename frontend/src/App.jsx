@@ -27,8 +27,9 @@ function getSavedSidebarWidth() {
 }
 
 async function fetchThreads() {
-  const response = await fetch("http://localhost:8080/api/thread");
-  if (!response.ok) {
+const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/thread`);
+    if (!response.ok) {
     throw new Error("Could not load chat history.");
   }
 

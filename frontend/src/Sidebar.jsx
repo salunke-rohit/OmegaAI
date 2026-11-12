@@ -28,7 +28,8 @@ function Sidebar({ sidebarWidth, onResize }) {
         setThreadError("");
 
         try {
-            const response = await fetch(`http://localhost:8080/api/thread/${encodeURIComponent(threadId)}`);
+            const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/thread/${encodeURIComponent(threadId)}`);
             if (!response.ok) {
                 throw new Error("Could not load this conversation.");
             }
@@ -55,7 +56,7 @@ function Sidebar({ sidebarWidth, onResize }) {
         setThreadError("");
 
         try {
-            const response = await fetch(`http://localhost:8080/api/thread/${encodeURIComponent(threadId)}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/thread/${encodeURIComponent(threadId)}`, {
                 method: "DELETE"
             });
             if (!response.ok) {
